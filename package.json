@@ -1,0 +1,18 @@
+{
+  "name": "pebble-platform-sdk",
+  "version": "0.0.1",
+  "description": "Tool to compile and package pebble packages/apps/watchfaces compiling with different sdk version per platform",
+  "author": "Gavriel Fleischer <flocsy@gmail.com>",
+  "main": "bin/pebble-platform-sdk",
+  "bin": {
+    "pebble-platform-sdk": "bin/pebble-platform-sdk"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "V=`pebble sdk list|grep '(active)'|sed -e 's/ .*(active)//'`;npm install npm-add-script;cd ../..;node_modules/pebble-platform-sdk/node_modules/.bin/npmAddScript -k build -v \"pebble-platform-sdk aplite=${V} basalt=${V} chalk=${V} diorite=${V} emery=${V}\""
+  },
+  "license": "ISC",
+  "devDependencies": {
+    "npm-add-script": "=1.1.0"
+  }
+}
