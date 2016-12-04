@@ -1,33 +1,29 @@
 #!/bin/sh
-CACHE=.pebble-platform-sdk-build
+CACHE=.pebble-platform-sdk
 NAME=`python -c 'import json,sys;obj=json.load(sys.stdin);print obj.get("name")' < package.json`
 VERSION=`python -c 'import json,sys;obj=json.load(sys.stdin);print obj.get("version")' < package.json`
 mkdir -p ${CACHE}
-LAST_PLATFORM=
+LAST_SDK_VER=
 for PS in $@; do
     SDK_VER=`echo ${PS} | sed -e 's/.*=//'`
     PLATFORM=`echo ${PS} | sed -e 's/=.*//'`
-    LAST_PLATFORM=${PLATFORM}
-    if [ ! -d build-${SDK_VER} ]; then
+    LAST_SDK_VER=${SDK_VER}
+    if [ ! -d ${CACHE}/build-${SDK_VER} ]; then
         pebble clean
         pebble build --sdk=${SDK_VER}
-        mv build build-${SDK_VER}
+        mv build ${CACHE}/build-${SDK_VER}
     fi
-    cp build-${SDK_VER}/${NAME}.pbw ${CACHE}/${NAME}-${PLATFORM}.pbw
 done
-echo "LAST_PLATFORM:${LAST_PLATFORM}"
 rm -rf ${CACHE}/${NAME}
 mkdir -p ${CACHE}/${NAME}
 cd ${CACHE}/${NAME}
-unzip ../${NAME}-${LAST_PLATFORM}.pbw
-cd ..
+unzip ../build-${LAST_SDK_VER}/${NAME}.pbw
 for PS in $@; do
+    SDK_VER=`echo ${PS} | sed -e 's/.*=//'`
     PLATFORM=`echo ${PS} | sed -e 's/=.*//'`
-    unzip ${NAME}-${PLATFORM}.pbw ${PLATFORM}/*
-    rm -rf ${NAME}/${PLATFORM}
-    mv ${PLATFORM} ${NAME}/${PLATFORM}
+    rm -rf ${PLATFORM}
+    unzip ../build-${SDK_VER}/${NAME}.pbw ${PLATFORM}/*
 done
-cd ${NAME}
 zip -r --compression-method store ../${NAME}.pbw *.* */*
 cd ..
 cp ${NAME}.pbw ../${NAME}-${VERSION}.pbw
