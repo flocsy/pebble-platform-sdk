@@ -1,18 +1,27 @@
 #!/bin/sh
+set -e
 CACHE=.pebble-platform-sdk
 NAME=`python -c 'import json,sys;obj=json.load(sys.stdin);print obj.get("name")' < package.json`
 VERSION=`python -c 'import json,sys;obj=json.load(sys.stdin);print obj.get("version")' < package.json`
+PROJECT_TYPE=`python -c 'import json,sys;obj=json.load(sys.stdin);print obj.get("pebble").get("projectType")' < package.json`
+echo "NAME: ${NAME}"
+echo "VERSION: ${VERSION}"
+echo "PROJECT_TYPE: ${PROJECT_TYPE}"
 mkdir -p ${CACHE}
 LAST_SDK_VER=
+pebble clean
 for PS in $@; do
     SDK_VER=`echo ${PS} | sed -e 's/.*=//'`
     PLATFORM=`echo ${PS} | sed -e 's/=.*//'`
     LAST_SDK_VER=${SDK_VER}
-    if [ ! -d ${CACHE}/build-${SDK_VER} ]; then
-        pebble clean
-        pebble build --sdk=${SDK_VER}
-        mv build ${CACHE}/build-${SDK_VER}
+    if [ -d ${CACHE}/build-${SDK_VER} ]; then
+        mv ${CACHE}/build-${SDK_VER} build
     fi
+    pebble build --sdk=${SDK_VER}
+    if [ ${PROJECT_TYPE} == "package" ]; then
+        mv dist.zip build/
+    fi
+    mv build ${CACHE}/build-${SDK_VER}
 done
 rm -rf ${CACHE}/${NAME}
 mkdir -p ${CACHE}/${NAME}
