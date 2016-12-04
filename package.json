@@ -1,8 +1,9 @@
 {
   "name": "pebble-platform-sdk",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Tool to compile and package pebble packages/apps/watchfaces compiling with different sdk version per platform",
   "author": "Gavriel Fleischer <flocsy@gmail.com>",
+  "keywords": ["pebble", "pebble-package"],
   "main": "bin/pebble-platform-sdk",
   "bin": {
     "pebble-platform-sdk": "bin/pebble-platform-sdk"
